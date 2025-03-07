@@ -6,7 +6,6 @@ WORKDIR /src
 COPY go.mod .
 COPY go.sum .
 RUN go mod download
-RUN go mod vendor
 
 COPY . .
 
@@ -18,7 +17,7 @@ COPY . .
 ENV CGO_ENABLED=0
 #RUN go env -w GO111MODULE=auto
 #RUN env $(cat .env | xargs) go build -o /docker-ipv6nat.$(echo "$TARGETPLATFORM" | sed -E 's/(^linux|\/)//g') ./cmd/docker-ipv6nat
-RUN go build -o /docker-ipv6nat ./cmd/docker-ipv6nat
+RUN CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build -o /docker-ipv6nat ./cmd/docker-ipv6nat
 
 FROM alpine:3.20 AS release
 RUN apk add --no-cache ip6tables
